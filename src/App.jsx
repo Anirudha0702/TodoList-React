@@ -1,9 +1,15 @@
-import { useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import './App.css'
+import { Context } from "./state/Context";
 function App() {
-  const [todoTitle,setTodoTitle]=useState("");
-  const [todoContent,setTodoContent]=useState("");
-  const [todoList,setTodoList]=useState([]);
+const [todoTitle,setTodoTitle]=useState("");
+const [todoContent,setTodoContent]=useState("");
+const{task,dispatch}=useContext(Context);
+
+useEffect(()=>{
+   localStorage.setItem("Tasks",JSON.stringify(task));
+},[task])
+
   const handleInput=(e)=>{
     e.preventDefault();
     e.target.name==='title'?setTodoTitle(e.target.value):setTodoContent(e.target.value);
@@ -11,16 +17,14 @@ function App() {
   const handleAdd=()=>{
     const newTask={
       "title":todoTitle,
-      "content":todoContent
+      "content":todoContent,
     }
-    setTodoList([...todoList,newTask]);
+    dispatch({type:"ADD",payload:newTask})
     setTodoTitle("");
     setTodoContent("");
   }
   const deleteTask=(key)=>{
-    const array=[...todoList];
-    array.splice(key,1);
-    setTodoList(array);
+    dispatch({type:"REMOVE",payload:key})
   }
   return (
     <div className="App">
@@ -36,24 +40,24 @@ function App() {
           <input type="text" name="content"className="todo--content"value={todoContent}placeholder="write task"onChange={(e)=>handleInput(e)}/>
           
         </div>
-        <button className="todo--btn__add" onClick={handleAdd}>Create Task</button>
+        <button className="todo--btn__add"  onClick={handleAdd} disabled={(todoTitle ==="" || todoContent==="")?true:false}>Create Task</button>
       </section>
 
       <main>
         {
-          todoList.map((task,key)=>{
+          task.map((task,key)=>{
             return(
               <>
-              <div className="todo--task__container" key={key}>
+              <div className="todo--task__container" key={key} style={{backgroundColor:"#F95335"}}>
               <div className="todo--task__title">
-                {task.title}
+                {task?.title}
                 <button className="dltbtn"onClick={()=>{
                   deleteTask(key);
-                }}>Delete</button>
+                }} >Delete</button>
               </div>
-              <div className="todo--task__content">
-                {task.content}
-              </div>
+                <div className="todo--task__content">
+                  {task?.content}
+                </div>
               </div>
               </>
             )
