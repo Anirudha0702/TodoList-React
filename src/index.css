@@ -39,7 +39,6 @@ html, body{
     height:100vh;
     line-height: 1.3;
     font-family: var(--primary-ff);
-    /* background-image: var(--gradient-main); */
 }
 
 p,
